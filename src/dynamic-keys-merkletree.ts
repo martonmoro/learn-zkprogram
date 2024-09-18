@@ -66,8 +66,7 @@ const sideloadedProgram2 = ZkProgram({
 
 
 // given a zkProgram, we compute the feature flags that we need in order to verify proofs that were generated
-const featureFlags = await FeatureFlags.fromZkProgram(sideloadedProgram);
-const featureFlags2 = await FeatureFlags.fromZkProgram(sideloadedProgram2);
+const commonFeatureFlags = await FeatureFlags.fromZkProgramList([sideloadedProgram, sideloadedProgram2]);
 
 class SideloadedProgramProof extends DynamicProof<Field, Field> {
     static publicInputType = Field;
@@ -75,16 +74,7 @@ class SideloadedProgramProof extends DynamicProof<Field, Field> {
     static maxProofsVerified = 0 as const;
 
     // we use the feature flags that we computed from the `sideloadedProgram` ZkProgram
-    static featureFlags = featureFlags;
-}
-
-class SideloadedProgramProof2 extends DynamicProof<Field, Field> {
-    static publicInputType = Field;
-    static publicOutputType = Field;
-    static maxProofsVerified = 0 as const;
-
-    // we use the feature flags that we computed from the `sideloadedProgram` ZkProgram
-    static featureFlags = featureFlags2;
+    static featureFlags = commonFeatureFlags;
 }
 
 const tree = new MerkleTree(64);
@@ -238,7 +228,7 @@ const proof5 = await mainProgram.validateUsingTree(
     proof4,
     program2Vk,
     witness2,
-    SideloadedProgramProof2.fromProof(childProof3)
+    SideloadedProgramProof.fromProof(childProof3)
 );
 
 const validProof5 = await verify(proof5, mainVk);
@@ -253,7 +243,7 @@ const proof6 = await mainProgram.validateUsingTree(
     proof5,
     program2Vk,
     witness2,
-    SideloadedProgramProof2.fromProof(childProof4)
+    SideloadedProgramProof.fromProof(childProof4)
 );
 
 const validProof6 = await verify(proof6, mainVk);
